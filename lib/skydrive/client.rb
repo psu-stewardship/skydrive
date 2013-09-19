@@ -80,10 +80,14 @@ module Skydrive
             return Skydrive::Collection.new(self, filtered_response["data"])
           elsif filtered_response["location"]
             return filtered_response
-          elsif filtered_response["id"].match /^comment\..+/
-            return Skydrive::Comment.new(self, filtered_response)
+          elsif !filtered_response["id"].blank?
+            if filtered_response["id"].match /^comment\..+/
+              return Skydrive::Comment.new(self, filtered_response)
+            else
+              return "Skydrive::#{filtered_response["type"].capitalize}".constantize.new(self, filtered_response)
+            end
           else
-            return "Skydrive::#{filtered_response["type"].capitalize}".constantize.new(self, filtered_response)
+            return  response
           end
         else
           return true
